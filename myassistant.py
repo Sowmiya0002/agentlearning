@@ -1,9 +1,7 @@
 import streamlit as st
-from langchain.agents import AgentExecutor, create_react_agent
+from langchain.agents import initialize_agent, AgentType
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.prompts import ChatPromptTemplate
-from langchain.tools import Tool as LangChainTool
-from langchain_core.runnables import RunnableLambda
+from langchain.tools import Tool
 import datetime
 
 # --- Hardcoded Gemini API Key ---
@@ -16,46 +14,43 @@ llm = ChatGoogleGenerativeAI(
     temperature=0.4
 )
 
-# --- Tools: Define a daily UI/UX trends function ---
-def fetch_daily_uiux_trends(_):
+# --- Tool: Daily UI/UX Trends ---
+def fetch_uiux_trends(query: str) -> str:
     today = datetime.date.today().strftime("%B %d, %Y")
     return (
-        f"Here are the top UI/UX trends for {today}:\n"
-        "1. Neumorphism revival in dashboard design\n"
-        "2. AI-assisted design tools gaining traction\n"
-        "3. Increased focus on accessibility and dark mode\n"
-        "4. More micro-interactions in mobile UI\n"
-        "5. Multi-modal UI exploration with voice+touch"
+        f"Here are the top UI/UX trends for {today} based on '{query}':\n"
+        "1. Voice-based UI explorations\n"
+        "2. AI-driven prototyping\n"
+        "3. Inclusive design principles\n"
+        "4. Design systems for multi-brand products\n"
+        "5. Gamified microinteractions in web apps"
     )
 
-# --- Tool wrapper for LangChain ---
-daily_trend_tool = LangChainTool(
-    name="Daily UI/UX Trends",
-    func=fetch_daily_uiux_trends,
-    description="Fetch today's top 5 UI/UX design trends for designers."
+trend_tool = Tool(
+    name="UI/UX Trend Helper",
+    func=fetch_uiux_trends,
+    description="Helps designers get daily UI/UX trends given a topic or question."
 )
 
-# --- Agent Setup ---
-tools = [daily_trend_tool]
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful UX mentor for designers. Use tools if needed."),
-    ("user", "{input}")
-])
-
-agent = create_react_agent(llm=llm, tools=tools, prompt=prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+# --- Initialize LangChain Agent ---
+agent_executor = initialize_agent(
+    tools=[trend_tool],
+    llm=llm,
+    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
 
 # --- Streamlit UI ---
-st.set_page_config(page_title="Daily UX Mentor", layout="wide")
-st.title("🎨 Daily UX Mentor — Powered by LangChain Agent")
+st.set_page_config(page_title="UX Trend Agent", layout="wide")
+st.title("🧠 UX Trend Agent — Stay Updated with LangChain Agents")
 
-user_query = st.text_input("Ask your question about UI/UX trends:", placeholder="e.g. What are today's design trends?")
+query = st.text_input("🎯 Ask about a UI/UX topic or trend:", placeholder="e.g. What's trending in mobile UX?")
 
-if user_query:
-    with st.spinner("Thinking like a design mentor..."):
+if query:
+    with st.spinner("Finding the latest trends for you..."):
         try:
-            response = agent_executor.invoke({"input": user_query})
-            st.success("Here's your UX insight:")
-            st.write(response["output"])
+            result = agent_executor.run(query)
+            st.success("🔍 Trend Insights:")
+            st.write(result)
         except Exception as e:
-            st.error("❌ Something went wrong: " + str(e))
+            st.error(f"🚫 Error: {e}")
