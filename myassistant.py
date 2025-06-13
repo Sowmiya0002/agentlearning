@@ -5,7 +5,7 @@ from langchain.tools import Tool
 import datetime
 
 # --- Hardcoded Gemini API Key ---
-GOOGLE_API_KEY = "AIzaSyB5sW_eEBjodfjeORfXnAARBTFEREvIp9k"
+GOOGLE_API_KEY = "AIzaSyCqxkfddGd92M7nkCt_RDAlX3Uq56pM9u0"
 
 # --- Set up LLM ---
 llm = ChatGoogleGenerativeAI(
