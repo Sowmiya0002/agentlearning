@@ -1,6 +1,5 @@
 import streamlit as st
 from langchain.agents import AgentExecutor, create_react_agent
-from langchain.agents.agent_toolkits import Tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.tools import Tool as LangChainTool
@@ -17,7 +16,7 @@ llm = ChatGoogleGenerativeAI(
     temperature=0.4
 )
 
-# --- Tools: Define a fake daily UI/UX trends function ---
+# --- Tools: Define a daily UI/UX trends function ---
 def fetch_daily_uiux_trends(_):
     today = datetime.date.today().strftime("%B %d, %Y")
     return (
