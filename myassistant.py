@@ -8,11 +8,11 @@ from langchain_core.runnables import RunnableLambda
 import datetime
 
 # --- Hardcoded Gemini API Key ---
-GOOGLE_API_KEY = "your-google-api-key"
+GOOGLE_API_KEY = "AIzaSyBoI2dqMaHAr3iwiQaW_-H_Jo9uAUxPqv4"
 
 # --- Set up LLM ---
 llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-flash",
+    model="gemini-2.0-flash-lite",
     google_api_key=GOOGLE_API_KEY,
     temperature=0.4
 )
